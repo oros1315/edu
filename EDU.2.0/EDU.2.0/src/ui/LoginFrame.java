@@ -1,19 +1,27 @@
 package ui;
 
 import controller.LoginController;
-import model.*;
+import model.Usuario;
 import persistence.FileManager;
 import persistence.DataLoader;
+import model.AutenticacionModel;
+import model.HistorialObservaciones;
+import model.ObservacionModel;
+import model.UsuarioModel;
+import model.ReclamoModel;
+import model.ActividadModel;
+import model.ReporteModel;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
 public class LoginFrame extends JFrame {
 
-
     private LoginController loginController;
+
     private AutenticacionModel autenticacionModel;
     private HistorialObservaciones historial;
     private ObservacionModel observacionModel;
@@ -33,7 +41,6 @@ public class LoginFrame extends JFrame {
         inicializarUI();
         cargarDatos();
     }
-
 
     private void inicializarModelos() {
         autenticacionModel = new AutenticacionModel();
@@ -57,18 +64,15 @@ public class LoginFrame extends JFrame {
         fileManager.guardarTodosLosDatos();
     }
 
-
     private void inicializarUI() {
         setTitle("EduObservador v2.0 - Acceso");
         setSize(450, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Centrar ventana
+        setLocationRelativeTo(null);
         setResizable(false);
-
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBackground(new Color(248, 250, 252));
-
 
         JPanel cardPanel = new JPanel(new GridBagLayout());
         cardPanel.setBackground(Color.WHITE);
@@ -81,7 +85,6 @@ public class LoginFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         gbc.gridx = 0;
-
 
         JLabel lblIcono = new JLabel("🛡️", SwingConstants.CENTER);
         lblIcono.setFont(new Font("Segoe UI", Font.PLAIN, 40));
@@ -101,7 +104,6 @@ public class LoginFrame extends JFrame {
         gbc.gridy = 2;
         gbc.insets = new Insets(5, 0, 25, 0);
         cardPanel.add(lblSubtitulo, gbc);
-
 
         JLabel lblCodigo = new JLabel("Código de Usuario");
         lblCodigo.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -137,7 +139,6 @@ public class LoginFrame extends JFrame {
         gbc.insets = new Insets(0, 0, 25, 0);
         cardPanel.add(txtContrasena, gbc);
 
-
         btnLogin = new JButton("Iniciar Sesión") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -158,12 +159,9 @@ public class LoginFrame extends JFrame {
         };
         btnLogin.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnLogin.setForeground(Color.WHITE);
-
-
         btnLogin.setContentAreaFilled(false);
         btnLogin.setBorderPainted(false);
         btnLogin.setFocusPainted(false);
-
         btnLogin.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
         btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnLogin.addActionListener(new LoginAction());
@@ -171,10 +169,9 @@ public class LoginFrame extends JFrame {
         gbc.insets = new Insets(0, 0, 15, 0);
         cardPanel.add(btnLogin, gbc);
 
-
         lblMensaje = new JLabel("", SwingConstants.CENTER);
         lblMensaje.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblMensaje.setForeground(new Color(220, 38, 38)); // Rojo error
+        lblMensaje.setForeground(new Color(220, 38, 38));
         gbc.gridy = 8;
         gbc.insets = new Insets(0, 0, 10, 0);
         cardPanel.add(lblMensaje, gbc);
@@ -192,7 +189,6 @@ public class LoginFrame extends JFrame {
         getRootPane().setDefaultButton(btnLogin);
     }
 
-
     private class LoginAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -205,13 +201,13 @@ public class LoginFrame extends JFrame {
             }
 
             try {
-
+                // La vista solo pide al controller que autentique
                 Usuario usuario = loginController.autenticar(codigo, contrasena);
-
                 guardarDatos();
                 String rol = loginController.redirigirSegunRol(usuario);
                 dispose();
 
+                // Los modelos se pasan a los frames destino (inyección de dependencias)
                 switch (rol) {
                     case "ESTUDIANTE":
                         new EstudianteFrame(usuario.getCodigo(), observacionModel, reclamoModel, fileManager).setVisible(true);
@@ -234,24 +230,19 @@ public class LoginFrame extends JFrame {
                         System.exit(0);
                 }
             } catch (Exception ex) {
-
                 String mensajeError = ex.getMessage();
-
                 if (mensajeError != null && mensajeError.contains("Exception:")) {
                     mensajeError = mensajeError.split("Exception:")[1].trim();
                 }
-
                 lblMensaje.setText(mensajeError);
                 txtContrasena.setText("");
             }
         }
     }
 
-
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
-
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
                 e.printStackTrace();

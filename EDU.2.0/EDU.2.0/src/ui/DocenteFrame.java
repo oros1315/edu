@@ -1,7 +1,9 @@
 package ui;
 
 import controller.DocenteController;
-import model.*;
+import model.Observacion;
+import model.ObservacionModel;
+import model.ActividadModel;
 import persistence.FileManager;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -11,12 +13,10 @@ import java.awt.*;
 import java.util.Date;
 import java.util.List;
 
+
 public class DocenteFrame extends JFrame {
 
-
     private DocenteController controller;
-    private ObservacionModel observacionModel;
-    private ActividadModel actividadModel;
     private FileManager fileManager;
     private String idDocente;
 
@@ -33,8 +33,6 @@ public class DocenteFrame extends JFrame {
     public DocenteFrame(String idDocente, ObservacionModel observacionModel,
                         ActividadModel actividadModel, FileManager fileManager) {
         this.idDocente = idDocente;
-        this.observacionModel = observacionModel;
-        this.actividadModel = actividadModel;
         this.fileManager = fileManager;
         this.controller = new DocenteController(observacionModel, actividadModel);
 
@@ -148,11 +146,9 @@ public class DocenteFrame extends JFrame {
         };
         btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btn.setForeground(new Color(203, 213, 225));
-
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-
         btn.setHorizontalAlignment(SwingConstants.LEFT);
         btn.setBorder(new EmptyBorder(12, 15, 12, 15));
         btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
@@ -195,11 +191,9 @@ public class DocenteFrame extends JFrame {
         };
         btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btn.setForeground(Color.WHITE);
-
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-
         btn.setBorder(new EmptyBorder(10, 15, 10, 15));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;

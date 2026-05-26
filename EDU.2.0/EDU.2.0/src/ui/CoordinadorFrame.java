@@ -1,7 +1,12 @@
 package ui;
 
 import controller.CoordinadorController;
-import model.*;
+import model.Observacion;
+import model.Usuario;
+import model.HistorialObservaciones;
+import model.ObservacionModel;
+import model.UsuarioModel;
+import model.ReporteModel;
 import persistence.FileManager;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -10,21 +15,17 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.List;
 
-public class CoordinadorFrame extends JFrame {
-    private HistorialObservaciones historial;
 
+public class CoordinadorFrame extends JFrame {
 
     private CoordinadorController controller;
-    private UsuarioModel usuarioModel;
-    private ObservacionModel observacionModel;
-    private ReporteModel reporteModel;
     private FileManager fileManager;
+    private HistorialObservaciones historial;
     private String idCoordinador;
 
     private JTable tablaUsuarios, tablaObservaciones;
     private DefaultTableModel modelUsuarios, modelObservaciones;
     private JTextArea txtReporte;
-
 
     private CardLayout cardLayout;
     private JPanel panelCentral;
@@ -38,14 +39,9 @@ public class CoordinadorFrame extends JFrame {
                             HistorialObservaciones historial) {
 
         this.idCoordinador = idCoordinador;
-        this.usuarioModel = usuarioModel;
-        this.observacionModel = observacionModel;
-        this.reporteModel = reporteModel;
         this.fileManager = fileManager;
-        this.controller = new CoordinadorController(usuarioModel, observacionModel, reporteModel);
-
-
         this.historial = historial;
+        this.controller = new CoordinadorController(usuarioModel, observacionModel, reporteModel);
 
         setTitle("EduObservador v2.0 - Coordinador");
         setSize(1200, 750);
@@ -67,7 +63,6 @@ public class CoordinadorFrame extends JFrame {
     private void inicializarUI() {
         setLayout(new BorderLayout());
 
-
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(new Color(30, 58, 138));
         headerPanel.setBorder(new EmptyBorder(15, 20, 15, 20));
@@ -83,7 +78,6 @@ public class CoordinadorFrame extends JFrame {
         lblUser.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblUser.setForeground(new Color(147, 197, 253));
 
-
         JButton btnCerrar = estilizarBoton("Cerrar Sesión", new Color(220, 38, 38));
         btnCerrar.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnCerrar.addActionListener(e -> {
@@ -98,7 +92,6 @@ public class CoordinadorFrame extends JFrame {
 
         add(headerPanel, BorderLayout.NORTH);
 
-
         JPanel sidebarPanel = new JPanel();
         sidebarPanel.setPreferredSize(new Dimension(250, 0));
         sidebarPanel.setBackground(new Color(30, 41, 59));
@@ -112,7 +105,6 @@ public class CoordinadorFrame extends JFrame {
         sidebarPanel.add(lblMenu);
         sidebarPanel.add(Box.createVerticalStrut(20));
 
-
         cardLayout = new CardLayout();
         panelCentral = new JPanel(cardLayout);
         panelCentral.setBackground(new Color(248, 250, 252));
@@ -122,7 +114,6 @@ public class CoordinadorFrame extends JFrame {
         panelCentral.add(crearPanelAnular(), "Anular");
         panelCentral.add(crearPanelReportes(), "Reportes");
         panelCentral.add(crearPanelHistorial(), "Historial");
-
 
         JButton btnUsuarios = crearBotonMenu("👥 Gestión Usuarios", "Usuarios");
         JButton btnAnular = crearBotonMenu("🚫 Anular Observación", "Anular");
@@ -142,7 +133,6 @@ public class CoordinadorFrame extends JFrame {
         add(sidebarPanel, BorderLayout.WEST);
         add(panelCentral, BorderLayout.CENTER);
     }
-
 
     private JButton crearBotonMenu(String texto, String nombreCarta) {
         JButton btn = new JButton(texto) {
@@ -165,11 +155,9 @@ public class CoordinadorFrame extends JFrame {
         };
         btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btn.setForeground(new Color(203, 213, 225));
-
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-
         btn.setHorizontalAlignment(SwingConstants.LEFT);
         btn.setBorder(new EmptyBorder(12, 15, 12, 15));
         btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
@@ -178,7 +166,7 @@ public class CoordinadorFrame extends JFrame {
         btn.addActionListener(e -> {
             cardLayout.show(panelCentral, nombreCarta);
             marcarBotonActivo(btn);
-            if(nombreCarta.equals("Anular")) cargarTodasObservaciones();
+            if (nombreCarta.equals("Anular")) cargarTodasObservaciones();
         });
         return btn;
     }
@@ -213,11 +201,9 @@ public class CoordinadorFrame extends JFrame {
         };
         btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btn.setForeground(Color.WHITE);
-
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-
         btn.setBorder(new EmptyBorder(10, 15, 10, 15));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
@@ -370,16 +356,12 @@ public class CoordinadorFrame extends JFrame {
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(241, 245, 249)));
         tarjetaTabla.add(scrollPane, BorderLayout.CENTER);
 
-
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.setBackground(Color.WHITE);
         JButton btnCargarObs = estilizarBoton("Refrescar Observaciones", new Color(100, 116, 139));
         btnCargarObs.addActionListener(e -> cargarTodasObservaciones());
-
         bottomPanel.add(btnCargarObs);
-
         tarjetaTabla.add(bottomPanel, BorderLayout.SOUTH);
-
 
         JPanel wrapper = new JPanel(new BorderLayout(0, 15));
         wrapper.setOpaque(false);
@@ -387,7 +369,6 @@ public class CoordinadorFrame extends JFrame {
         wrapper.add(tarjetaTabla, BorderLayout.CENTER);
 
         panel.add(wrapper, BorderLayout.CENTER);
-
         return panel;
     }
 
@@ -471,6 +452,7 @@ public class CoordinadorFrame extends JFrame {
         btnBuscar.addActionListener(e -> {
             String estudiante = txtEstudiante.getText().trim();
             if (estudiante.isEmpty()) return;
+
             List<Observacion> lista = controller.consultarHistorial(estudiante);
 
             JDialog dialog = new JDialog(this, "Historial de " + estudiante, true);
@@ -507,7 +489,6 @@ public class CoordinadorFrame extends JFrame {
         return panel;
     }
 
-
     private void cargarUsuarios() {
         modelUsuarios.setRowCount(0);
         List<Usuario> usuarios = controller.listarUsuarios();
@@ -522,13 +503,9 @@ public class CoordinadorFrame extends JFrame {
     }
 
     private void cargarTodasObservaciones() {
-
         modelObservaciones.setRowCount(0);
-
         List<Observacion> lista = historial.getObservaciones();
-
         for (Observacion obs : lista) {
-
             modelObservaciones.addRow(new Object[]{
                     obs.getId(),
                     obs.getIdEstudiante(),
@@ -537,9 +514,9 @@ public class CoordinadorFrame extends JFrame {
                     obs.isActiva() ? "Activa" : "Anulada"
             });
         }
-
         modelObservaciones.fireTableDataChanged();
     }
+
     private void mostrarDialogoCrearUsuario() {
         JDialog dialog = new JDialog(this, "Crear Usuario", true);
         dialog.setSize(400, 350);

@@ -1,7 +1,9 @@
 package ui;
 
 import controller.EstudianteController;
-import model.*;
+import model.Observacion;
+import model.ObservacionModel;
+import model.ReclamoModel;
 import persistence.FileManager;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -10,11 +12,10 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.List;
 
+
 public class EstudianteFrame extends JFrame {
 
     private EstudianteController controller;
-    private ObservacionModel observacionModel;
-    private ReclamoModel reclamoModel;
     private FileManager fileManager;
     private String idEstudiante;
 
@@ -29,8 +30,6 @@ public class EstudianteFrame extends JFrame {
     public EstudianteFrame(String idEstudiante, ObservacionModel observacionModel,
                            ReclamoModel reclamoModel, FileManager fileManager) {
         this.idEstudiante = idEstudiante;
-        this.observacionModel = observacionModel;
-        this.reclamoModel = reclamoModel;
         this.fileManager = fileManager;
         this.controller = new EstudianteController(observacionModel, reclamoModel);
 
@@ -104,7 +103,6 @@ public class EstudianteFrame extends JFrame {
         panelCentral.add(crearPanelHistorial(), "Historial");
         panelCentral.add(crearPanelReclamos(), "Reclamos");
 
-
         JButton btnActivas = crearBotonMenu("📋 Observaciones Activas", "Activas");
         JButton btnHistorial = crearBotonMenu("🔍 Historial Completo", "Historial");
         JButton btnReclamos = crearBotonMenu("✉️ Solicitar Reclamo", "Reclamos");
@@ -121,13 +119,11 @@ public class EstudianteFrame extends JFrame {
         add(panelCentral, BorderLayout.CENTER);
     }
 
-
     private JButton crearBotonMenu(String texto, String nombreCarta) {
         JButton btn = new JButton(texto) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
-
                 if (btnNavActivo == this) {
                     g2.setColor(new Color(37, 99, 235));
                 } else if (getModel().isPressed()) {
@@ -147,7 +143,6 @@ public class EstudianteFrame extends JFrame {
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-
         btn.setHorizontalAlignment(SwingConstants.LEFT);
         btn.setBorder(new EmptyBorder(12, 15, 12, 15));
         btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
@@ -183,7 +178,6 @@ public class EstudianteFrame extends JFrame {
                 } else {
                     g2.setColor(bg);
                 }
-
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
                 g2.dispose();
                 super.paintComponent(g);
@@ -191,16 +185,13 @@ public class EstudianteFrame extends JFrame {
         };
         btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btn.setForeground(Color.WHITE);
-
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-
         btn.setBorder(new EmptyBorder(10, 15, 10, 15));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
-
 
     private JPanel crearPanelObservaciones() {
         JPanel panel = new JPanel(new BorderLayout(15, 15));
@@ -218,7 +209,6 @@ public class EstudianteFrame extends JFrame {
                 new EmptyBorder(15, 15, 15, 15)
         ));
 
-        // Tabla
         String[] columnas = {"ID", "Tipo", "Severidad", "Fecha", "Materia", "Descripción", "Estado"};
         tableModel = new DefaultTableModel(columnas, 0) {
             @Override public boolean isCellEditable(int row, int column) { return false; }
@@ -274,11 +264,13 @@ public class EstudianteFrame extends JFrame {
         JButton btnCargar = estilizarBoton("⬇️ Cargar Todo el Historial", new Color(37, 99, 235));
         btnCargar.addActionListener(e -> {
             model.setRowCount(0);
+            // El controller devuelve la lista; la vista solo la muestra
             List<Observacion> lista = controller.consultarHistorial(idEstudiante);
             for (Observacion obs : lista) {
                 model.addRow(new Object[]{
                         obs.getId(), obs.getTipo(), obs.getSeveridad(), obs.getFecha(),
-                        obs.getMateria(), obs.getDescripcion().length() > 50 ? obs.getDescripcion().substring(0, 50) + "..." : obs.getDescripcion(),
+                        obs.getMateria(),
+                        obs.getDescripcion().length() > 50 ? obs.getDescripcion().substring(0, 50) + "..." : obs.getDescripcion(),
                         obs.isActiva() ? "Activa" : "Anulada"
                 });
             }
@@ -333,6 +325,7 @@ public class EstudianteFrame extends JFrame {
                 JOptionPane.showMessageDialog(panel, "Por favor escriba el motivo del reclamo.", "Campo vacío", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+
             controller.solicitarReclamo(descripcion);
             txtReclamo.setText("");
             fileManager.guardarTodosLosDatos();
@@ -367,7 +360,8 @@ public class EstudianteFrame extends JFrame {
         for (Observacion obs : lista) {
             tableModel.addRow(new Object[]{
                     obs.getId(), obs.getTipo(), obs.getSeveridad(), obs.getFecha(),
-                    obs.getMateria(), obs.getDescripcion().length() > 50 ? obs.getDescripcion().substring(0, 50) + "..." : obs.getDescripcion(),
+                    obs.getMateria(),
+                    obs.getDescripcion().length() > 50 ? obs.getDescripcion().substring(0, 50) + "..." : obs.getDescripcion(),
                     obs.isActiva() ? "Activa" : "Anulada"
             });
         }
